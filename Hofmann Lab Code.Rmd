@@ -31,8 +31,6 @@ trisdata <- read_csv(here("data","7.12.2021-tris.csv")) %>%
 ## Creating the OMEGAS table
 ```{r}
 omegas <- data.frame(trisdata$voltage_1_m_v,trisdata$voltage_2_m_v,trisdata$voltage_3_m_v,trisdata$voltage_4_m_v) %>% # create OMEGAS data frame with the tris voltages
-  view("omegas") %>% # view data frame in environment
-  clean_names() %>% #standardize column names
   as.numeric(omegas$trisdata.voltage_1_m_v,omegas$trisdata.voltage_2_m_v,omegas$trisdata.voltage_3_m_v,omegas$trisdata.voltage_4_m_v) %>% # make the values in the data frame numeric arguments
 class(omegas$trisdata.voltage_1_m_v) # why does the class of the columns keep showing up as "character" after I convert them to numeric arguments?
 
