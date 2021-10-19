@@ -1,0 +1,60 @@
+---
+title: "Hofmann Lab Code"
+author: "Zoe Fung"
+date: "10/14/2021"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+# install/load packages
+install.packages("tidyverse")
+library(tidyverse)
+library(readxl)
+library(readr)
+install.packages("janitor")
+library(janitor)
+install.packages("here")
+library(here)
+install.packages("lubridate")
+library(lubridate)
+update.packages("tidyverse")
+update.packages("janitor")
+update.packages("here")
+```
+
+## Importing data
+```{r}
+trisdata <- read_csv(here("7.12.2021-tris.csv")) %>%
+  filter(row_number()!=c(1:5)) %>% # remove the first 5 rows
+  row_to_names(row_number=1) %>% # make the top row the column headers
+  clean_names() %>% # clean up column header names
+  mutate(date_lubridate=ymd(date)) %>% # tell R "date" is a DATE
+  mutate(time_lubridate=hms(time)) %>% # tell R "time" is a TIME
+  unite(date_time, c(date, time), sep = " ", remove = TRUE) %>% # combine the date and time columns
+  mutate(date_time_lubridate=ymd_hms(date_time)) # tell R "date_time" is a DATE and a TIME
+```
+
+## Creating the OMEGAS table
+```{r}
+omegas <- data.frame(trisdata$voltage_1_m_v,trisdata$voltage_2_m_v,trisdata$voltage_3_m_v,trisdata$voltage_4_m_v) %>% # create OMEGAS data frame with the tris voltages
+  view("omegas") %>% # view data frame in environment
+  clean_names() %>% #standardize column names
+  as.numeric(omegas$trisdata.voltage_1_m_v,omegas$trisdata.voltage_2_m_v,omegas$trisdata.voltage_3_m_v,omegas$trisdata.voltage_4_m_v) %>% # make the values in the data frame numeric arguments
+class(omegas$trisdata.voltage_1_m_v) # why does the class of the columns keep showing up as "character" after I convert them to numeric arguments?
+
+# converting the mV to volts
+
+omegas_2 <- data.frame(omegas/1000) # OPTION 1: create new dataframe with /1000 values
+add_column(voltage1=(trisdata.voltage_1_m_v/1000)) # OPTION 2: add new columns with /1000 values 
+voltage1 <- mutate(omegas$trisdata.voltage_1_m_v/1000) # OPTION 2.1: use mutate function to create new columns
+
+# calculating Rthermistor
+
+mutate(omegas$vbattery=((voltage2/100)*101.57)) # create vbattery column 
+  # how do we apply mutate for dependent value columns? 
+mutate(omgeas$z=((voltage4/100)+vbattery*(15000/(1000000+15000)))) # create intermediate column k
+mutate(omegas$y=(z*1000000)) # create intermediate column l
+mutate(omegas$rthermistor=y/(vbattery-z)) # create Rthermistor column
+       
+```
