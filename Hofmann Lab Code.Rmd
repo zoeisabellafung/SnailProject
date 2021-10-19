@@ -31,25 +31,19 @@ trisdata <- read_csv(here("data","7.12.2021-tris.csv")) %>%
 ## Creating the OMEGAS table
 ```{r}
 omegas <- data.frame(trisdata$voltage_1_m_v,trisdata$voltage_2_m_v,trisdata$voltage_3_m_v,trisdata$voltage_4_m_v) %>% # create OMEGAS data frame with the tris voltages
-  mutate(v1=as.numeric(trisdata.voltage_1_m_v),
-         v2=as.numeric(trisdata.voltage_2_m_v),
-         v3=as.numeric(trisdata.voltage_3_m_v),
-         v4=as.numeric(trisdata.voltage_4_m_v)) %>%
-  select(v1, v2, v3, v4)
-         
-         ) %>%
-  mutate(v2=..s,dfa,.sdmf)
-
-
-  as.numeric(omegas$trisdata.voltage_1_m_v,omegas$trisdata.voltage_2_m_v,omegas$trisdata.voltage_3_m_v,omegas$trisdata.voltage_4_m_v) %>% # make the values in the data frame numeric arguments
-class(omegas$trisdata.voltage_1_m_v) # why does the class of the columns keep showing up as "character" after I convert them to numeric arguments?
+  mutate(mv1=as.numeric(trisdata.voltage_1_m_v),
+         mv2=as.numeric(trisdata.voltage_2_m_v),
+         mv3=as.numeric(trisdata.voltage_3_m_v),
+         mv4=as.numeric(trisdata.voltage_4_m_v)) %>% # changing data to numeric arguments
+  select(mv1, mv2, mv3, mv4) # cleaning data frame
 
 # converting the mV to volts
-
-omegas_2 <- data.frame(omegas/1000) # OPTION 1: create new dataframe with /1000 values
-add_column(voltage1=(trisdata.voltage_1_m_v/1000)) # OPTION 2: add new columns with /1000 values 
-voltage1 <- mutate(omegas$trisdata.voltage_1_m_v/1000) # OPTION 2.1: use mutate function to create new columns
-
+omegas_v <- omegas %>%
+  mutate(v1=(mv1/1000),
+         v2=(mv2/1000),
+         v3=(mv3/1000),
+         v4=(mv4/1000))
+      
 # calculating Rthermistor
 
 mutate(omegas$vbattery=((voltage2/100)*101.57)) # create vbattery column 
