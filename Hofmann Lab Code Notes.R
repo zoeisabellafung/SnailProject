@@ -11,3 +11,7 @@
 
 # having trouble pushing my code to git: can I write down the instructions to do so
   # how often should i be updating my code in git?
+  # need to commit before pushing ; push every time day !!!
+  # pull before you start working on your code in case someone has made changes 
+
+# more hashtags = larger header in r markdown

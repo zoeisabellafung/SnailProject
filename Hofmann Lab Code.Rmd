@@ -36,20 +36,19 @@ omegas <- data.frame(trisdata$voltage_1_m_v,trisdata$voltage_2_m_v,trisdata$volt
          mv3=as.numeric(trisdata.voltage_3_m_v),
          mv4=as.numeric(trisdata.voltage_4_m_v)) %>% # changing data to numeric arguments
   select(mv1, mv2, mv3, mv4) # cleaning data frame
+```
 
-# converting the mV to volts
-omegas_v <- omegas %>%
+### Calculating Rthermistor
+```{r}
+omegas_v <- omegas %>% # create new dataframe using omegas values
   mutate(v1=(mv1/1000),
          v2=(mv2/1000),
          v3=(mv3/1000),
-         v4=(mv4/1000))
-      
-# calculating Rthermistor
-
-mutate(omegas$vbattery=((voltage2/100)*101.57)) # create vbattery column 
-  # how do we apply mutate for dependent value columns? 
-mutate(omgeas$z=((voltage4/100)+vbattery*(15000/(1000000+15000)))) # create intermediate column k
-mutate(omegas$y=(z*1000000)) # create intermediate column l
-mutate(omegas$rthermistor=y/(vbattery-z)) # create Rthermistor column
-       
+         v4=(mv4/1000)) %>% # converting the mV to volts
+  mutate(vbattery=((v2/100)*101.57)) %>% # calculate vbattery
+  mutate(z=(v4/100)+vbattery*(15000/(1000000+15000))) %>% # calculate column k
+  mutate(y=(z*100000)) %>% # calculate column l
+  mutate(rthermistor=(y/(vbattery-z))) # calculate Rthermistor
 ```
+
+### Calculating Durafet T
