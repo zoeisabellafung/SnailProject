@@ -15,3 +15,26 @@
   # pull before you start working on your code in case someone has made changes 
 
 # more hashtags = larger header in r markdown
+
+# what is the function for durafet therm?
+
+# pH = N + O + P
+  # N = (B-(C*M)-(D*M*M))*1/K
+    # B = 11911.08
+    # C = 18.2499
+    # D = 0.039336
+    # M = 35
+    # K = 273.15
+  # O = -E+(F*M)+(G*M*M)
+    # E = 366.27059
+    # F = 0.53993607
+    # G = 0.00016329
+    # M = 35
+  # P = (H-(I*M))*ln(K)-(J*(K))
+    # H = 64.52243
+    # I = 0.084041
+    # J = 0.11149858
+    # K = 273. 15
+    # M = 35
+
+

@@ -28,7 +28,7 @@ trisdata <- read_csv(here("data","7.12.2021-tris.csv")) %>%
   mutate(date_time_lubridate=mdy_hms(date_time)) # tell R "date_time" is a DATE and a TIME
 ```
 
-## Creating the OMEGAS table
+## Creating the OMEGAS temperature table
 ```{r}
 omegas <- data.frame(trisdata$voltage_1_m_v,trisdata$voltage_2_m_v,trisdata$voltage_3_m_v,trisdata$voltage_4_m_v) %>% # create OMEGAS data frame with the tris voltages
   mutate(mv1=as.numeric(trisdata.voltage_1_m_v),
@@ -51,4 +51,27 @@ omegas_v <- omegas %>% # create new dataframe using omegas values
   mutate(rthermistor=(y/(vbattery-z))) # calculate Rthermistor
 ```
 
-### Calculating Durafet T
+### Calculating Durafet Therm
+
+## Calculating Tris pH
+```{r}
+temp <- c(omegas_v$durafet) # copy durafet therm into tris pH template
+b <- rep("11911.08",length(temp)) # create vector for tris pH template column b
+c <- rep("18.2499",length(temp)) # create vector for tris pH template column c
+d <- rep("0.039336",length(temp)) # create vector for tris pH template column d
+e <- rep("366.27059",length(temp)) # create vector for tris pH template column e
+f <- rep("0.53993607",length(temp)) # create vector for tris pH template column f
+g <- rep("0.00016329",length(temp)) # create vector for tris pH template column g
+h <- rep("64.52243",length(temp)) # create vector for tris pH template column h
+i <- rep("0.084041",length(temp)) # create vector for tris pH template column i
+j <- rep("0.11149858",length(temp)) # create vector for tris pH template column j
+m <- rep("35",length(temp)) # create vector for tris pH template column m
+k <- rep("273.15",length(temp)) # create vector for tris pH template column k
+tris_ph_template <- data.frame(temp,b,c,d,e,f,g,h,i,j,k,m) %>% # create tris pH template as a data frame with all above columns
+  mutate(n=(b-(c*m)-(d*m*m))*1/k) %>% # create column n
+  mutate(o=(-e+(f*m)+(g*m*m))) %>% # create column o
+  mutate(p=(h-(i*m))*ln(k)-(j*(k))) %>% # create column p
+  mutate(trisph=(n+o+p)) # calculate tris pH, add as a new column to tris pH template data frame
+```
+
+## Calculating OMEGAS pH
