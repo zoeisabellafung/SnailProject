@@ -37,4 +37,6 @@
     # K = 273. 15
     # M = 35
 
-
+# to find where temp and pH stabilize...would I use select function? 
+  # how would i just select one row? 
+  
