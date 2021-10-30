@@ -17,6 +17,7 @@
 # more hashtags = larger header in r markdown
 
 # what is the function for durafet therm?
+  # use arbitrary value for now 
 
 # pH = N + O + P
   # N = (B-(C*M)-(D*M*M))*1/K
@@ -39,4 +40,16 @@
 
 # to find where temp and pH stabilize...would I use select function? 
   # how would i just select one row? 
-  
+  # use lead and lag functions 5n - n
+    # then choose which difference value we want to use to select 
+  # remove first 30 min of data
+  # calculate avg & st. dev of difference between 5-1 values
+    # default crit value would be st. dev, but researcher has freedom to choose what crit value
+    # don't write function yet, WRITE THE CODE TO FIND MEAN/ST DEV OF UR DATA
+    # then write function around that code
+
+# goals for week 6:
+  # set an intermediate value for durafet therm, see if rest of code runs
+    # add in actual function for durafet therm when collaborator gets back to Amelia
+  # write the code to find the mean/standard deviation of the difference between the 5th and the 1st row
+    # to help pick out the calibration values (row where temp and pH stabilize)

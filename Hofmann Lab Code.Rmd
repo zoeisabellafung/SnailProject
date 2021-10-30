@@ -48,29 +48,34 @@ omegas_v <- omegas %>% # create new dataframe using omegas values
   mutate(vbattery=((v2/100)*101.57)) %>% # calculate vbattery
   mutate(z=(v4/100)+vbattery*(15000/(1000000+15000))) %>% # calculate column k
   mutate(y=(z*100000)) %>% # calculate column l
-  mutate(rthermistor=(y/(vbattery-z))) # calculate Rthermistor
+  mutate(rthermistor=(y/(vbattery-z))) %>% # calculate Rthermistor
+  mutate(durafet=(rthermistor*2)) %>% # calculate durafet therm *THIS IS AN INTERMEDIATE VALUE UNTIL TRUE VALUE CAN BE CALCULATED*
+  as.numeric(durafet) # error: object "durafet" not found
 ```
 
 ### Calculating Durafet Therm
+```{r}
+
+```
 
 ## Calculating Tris pH
 ```{r}
 temp <- c(omegas_v$durafet) # copy durafet therm into tris pH template
-b <- rep("11911.08",length(temp)) # create vector for tris pH template column b
-c <- rep("18.2499",length(temp)) # create vector for tris pH template column c
-d <- rep("0.039336",length(temp)) # create vector for tris pH template column d
-e <- rep("366.27059",length(temp)) # create vector for tris pH template column e
-f <- rep("0.53993607",length(temp)) # create vector for tris pH template column f
-g <- rep("0.00016329",length(temp)) # create vector for tris pH template column g
-h <- rep("64.52243",length(temp)) # create vector for tris pH template column h
-i <- rep("0.084041",length(temp)) # create vector for tris pH template column i
-j <- rep("0.11149858",length(temp)) # create vector for tris pH template column j
-m <- rep("35",length(temp)) # create vector for tris pH template column m
-k <- rep("273.15",length(temp)) # create vector for tris pH template column k
-tris_ph_template <- data.frame(temp,b,c,d,e,f,g,h,i,j,k,m) %>% # create tris pH template as a data frame with all above columns
+b <- as.numeric(rep("11911.08",length(temp))) # create vector for tris pH template column b
+c <- as.numeric(rep("18.2499",length(temp))) # create vector for tris pH template column c
+d <- as.numeric(rep("0.039336",length(temp))) # create vector for tris pH template column d
+e <- as.numeric(rep("366.27059",length(temp))) # create vector for tris pH template column e
+f <- as.numeric(rep("0.53993607",length(temp))) # create vector for tris pH template column f
+g <- as.numeric(rep("0.00016329",length(temp))) # create vector for tris pH template column g
+h <- as.numeric(rep("64.52243",length(temp))) # create vector for tris pH template column h
+i <- as.numeric(rep("0.084041",length(temp))) # create vector for tris pH template column i
+j <- as.numeric(rep("0.11149858",length(temp))) # create vector for tris pH template column j
+m <- as.numeric(rep("35",length(temp))) # create vector for tris pH template column m
+k <- as.numeric(rep("273.15",length(temp))) # create vector for tris pH template column k
+tris_ph_template <- data.frame(temp,b,c,d,e,f,g,h,i,j,k,m)%>% # create tris pH template as a data frame with all above columns
   mutate(n=(b-(c*m)-(d*m*m))*1/k) %>% # create column n
   mutate(o=(-e+(f*m)+(g*m*m))) %>% # create column o
-  mutate(p=(h-(i*m))*ln(k)-(j*(k))) %>% # create column p
+  mutate(p=(h-(i*m))*log(k)-(j*(k))) %>% # create column p
   mutate(trisph=(n+o+p)) # calculate tris pH, add as a new column to tris pH template data frame
 ```
 
@@ -78,7 +83,7 @@ tris_ph_template <- data.frame(temp,b,c,d,e,f,g,h,i,j,k,m) %>% # create tris pH 
 ```{r}
 omegas_calibration <- data.frame(omegas_v$durafet,omegas_v$v1) %>% # create data frame with durafet therm and voltage 1 values
   mutate(trisph=tris_ph_template$trisph) %>% # add tris pH values into calibration dataframe 
-  mutate(tk=(durafet+273.15)) %>% # add TK column to data frame
+  mutate(tk=(tris_ph_template$durafet+273.15)) %>% # add TK column to data frame; error: mutate incompatible size
   mutate(st=(8.31451*tk/96487*ln(10))) %>% # add S(T) column to data frame
   mutate(eot=(-0.374911706-(0.001*(tk-290.2751473)))) %>% # add Eo(T) column to data frame
   mutate(omegasph=(v1-eot)/st) %>% # add pH column to data frame
