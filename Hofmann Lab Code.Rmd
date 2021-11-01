@@ -49,8 +49,7 @@ omegas_v <- omegas %>% # create new dataframe using omegas values
   mutate(z=(v4/100)+vbattery*(15000/(1000000+15000))) %>% # calculate column k
   mutate(y=(z*100000)) %>% # calculate column l
   mutate(rthermistor=(y/(vbattery-z))) %>% # calculate Rthermistor
-  mutate(durafet=(rthermistor*2)) %>% # calculate durafet therm *THIS IS AN INTERMEDIATE VALUE UNTIL TRUE VALUE CAN BE CALCULATED*
-  as.numeric(durafet) # error: object "durafet" not found
+  mutate(durafet=(rthermistor*2)) # calculate durafet therm *THIS IS AN INTERMEDIATE VALUE UNTIL TRUE VALUE CAN BE CALCULATED*
 ```
 
 ### Calculating Durafet Therm
@@ -83,7 +82,9 @@ tris_ph_template <- data.frame(temp,b,c,d,e,f,g,h,i,j,k,m)%>% # create tris pH t
 ```{r}
 omegas_calibration <- data.frame(omegas_v$durafet,omegas_v$v1) %>% # create data frame with durafet therm and voltage 1 values
   mutate(trisph=tris_ph_template$trisph) %>% # add tris pH values into calibration dataframe 
+  # ERROR HERE
   mutate(tk=(tris_ph_template$durafet+273.15)) %>% # add TK column to data frame; error: mutate incompatible size
+  
   mutate(st=(8.31451*tk/96487*ln(10))) %>% # add S(T) column to data frame
   mutate(eot=(-0.374911706-(0.001*(tk-290.2751473)))) %>% # add Eo(T) column to data frame
   mutate(omegasph=(v1-eot)/st) %>% # add pH column to data frame
