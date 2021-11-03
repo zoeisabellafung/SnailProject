@@ -53,3 +53,8 @@
     # add in actual function for durafet therm when collaborator gets back to Amelia
   # write the code to find the mean/standard deviation of the difference between the 5th and the 1st row
     # to help pick out the calibration values (row where temp and pH stabilize)
+
+# notes for week 6 meeting
+  # since some of the outputs of the lead/lag functions won't actually be 5n-n, it might skew the mean/sd
+    # since deleting the first 30 minutes of data means deleting the first three rows, we should change n=5 to n=3 so the weird values from lag get omitted anyway
+
