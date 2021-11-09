@@ -49,15 +49,15 @@ omegas_v <- omegas %>% # create new dataframe using omegas values
   mutate(z=(v4/100)+vbattery*(15000/(1000000+15000))) %>% # calculate column k
   mutate(y=(z*100000)) %>% # calculate column l
   mutate(rthermistor=(y/(vbattery-z))) %>% # calculate Rthermistor
-  mutate(durafet=(rthermistor*2)) # calculate durafet therm *THIS IS AN INTERMEDIATE VALUE UNTIL TRUE VALUE CAN BE CALCULATED*
-```
-
-### Calculating Durafet Therm
-```{r}
-
+  mutate(sh_a=0.00106329736674527) %>% # create column with Steinhart constant A
+  mutate(sh_b=0.000251377462346306) %>% # create column with Steinhart constant B
+  mutate(sh_c=2.55455247726963E-08) %>% # create column with Steinhart constant C
+  mutate(k=(1/(sh_a+sh_b*log(rthermistor)+sh_c*(log(rthermistor))^3))) %>% # create column to calculate intermediate value K
+  mutate(durafet=(k-273.15)) # create new column to calculate durafet therm 
 ```
 
 ### Calculating Tris pH
+
 ```{r}
 temp <- c(omegas_v$durafet) # copy durafet therm into tris pH template
 b <- as.numeric(rep("11911.08",length(temp))) # create vector for tris pH template column b
@@ -95,9 +95,14 @@ omegas_calibration <- data.frame(omegas_v$durafet,omegas_v$v1) %>% # create data
 
 ## Choose calibration values
 ```{r}
-omegas_cleaned <- omegas_calibration %>% # create new data frame after deleting first 150 rows
+omegas_calibration %>% # work in omegas_calibration dataframe
   filter(row_number()!=c(1:150)) %>% # remove the first 150 rows (first 30 minutes of data)
-  filter(omegas_calibration,phdiff==min(phdiff)) %>% # select the row that contains the minimum value of change in pH over time and add it alone to a new data frame
+  filter(omegas_cleaned,phdiff==min(phdiff)) %>% # select the row that contains the minimum value of change in pH over time and add it alone to a new data frame
+  # THIS WAS WORKING YESTERDAY; WHY NOT TODAY?
+  # ERROR MESSAGE: "omegas_v.durafet must be a logical vector, not a double"
   add_row(filter(omegas_calibration,tempdiff==min(tempdiff))) # select the row that contains the minimum value of change in temperature over time and add it alone to the omegas_cleaned dataframe
   # what do we do when the row with min tempdiff and the row with min phdiff are different?
 ```
+
+## Adding sensor data into OMEGAS sheet 
+```{r}
