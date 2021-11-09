@@ -16,7 +16,7 @@ library(here)
 library(lubridate)
 ```
 
-## Importing data
+### Importing data
 ```{r}
 trisdata <- read_csv(here("data","7.12.2021-tris.csv")) %>%
   filter(row_number()!=c(1:5)) %>% # remove the first 5 rows
@@ -28,7 +28,7 @@ trisdata <- read_csv(here("data","7.12.2021-tris.csv")) %>%
   mutate(date_time_lubridate=mdy_hms(date_time)) # tell R "date_time" is a DATE and a TIME
 ```
 
-## Creating the OMEGAS temperature table
+### Creating the OMEGAS temperature table
 ```{r}
 omegas <- data.frame(trisdata$voltage_1_m_v,trisdata$voltage_2_m_v,trisdata$voltage_3_m_v,trisdata$voltage_4_m_v) %>% # create OMEGAS data frame with the tris voltages
   mutate(mv1=as.numeric(trisdata.voltage_1_m_v),
@@ -57,7 +57,7 @@ omegas_v <- omegas %>% # create new dataframe using omegas values
 
 ```
 
-## Calculating Tris pH
+### Calculating Tris pH
 ```{r}
 temp <- c(omegas_v$durafet) # copy durafet therm into tris pH template
 b <- as.numeric(rep("11911.08",length(temp))) # create vector for tris pH template column b
@@ -78,20 +78,26 @@ tris_ph_template <- data.frame(temp,b,c,d,e,f,g,h,i,j,k,m)%>% # create tris pH t
   mutate(trisph=(n+o+p)) # calculate tris pH, add as a new column to tris pH template data frame
 ```
 
-## Calculating calibration values
+### Calculating calibration values
+
+## Create OMEGAS pH sheet
 ```{r}
 omegas_calibration <- data.frame(omegas_v$durafet,omegas_v$v1) %>% # create data frame with durafet therm and voltage 1 values
   mutate(trisph=tris_ph_template$trisph) %>% # add tris pH values into calibration dataframe 
   mutate(tk=omegas_v$durafet+273.15) %>% # add TK column to data frame
-  mutate(st=(8.31451*tk/96487*ln(10))) %>% # add S(T) column to data frame
+  mutate(st=(8.31451*tk/96487*log(10))) %>% # add S(T) column to data frame
   mutate(eot=(-0.374911706-(0.001*(tk-290.2751473)))) %>% # add Eo(T) column to data frame
-  mutate(omegasph=(v1-eot)/st) %>% # add pH column to data frame
+  mutate(omegasph=(omegas_v$v1-eot)/st) %>% # add pH column to data frame
   mutate(diff=(trisph-omegasph)) %>% # add difference column (tris pH - omegas pH) to data frame
-  mutate(tempdiff=omegas_v.durafet-lag(omegas_v.durafet,n=3,default=first(omegas_v.durafet))) %>% # find difference between two temp measurements 5 rows apart to identify where temperature stabilizes
-    mutate(phdiff=omegasph-lag(omegasph,n=3,default=first(omegasph))) %>% # find difference between two pH measurements 5 rows apart to identify where pH stabilizes
-  filter(row_number()!=c(1:3)) %>% # remove the first 3 rows (first 30 minutes of data)
-  mean(tempdiff) # calculate the mean of the difference in temperature
-  sd(tempdiff) # calculate the standard deviation of the difference in temperature
-  mean(phdiff) # calculate the mean of the difference in pH
-  sd(phdiff) # calculate the standard deviation of the difference in pH
+  mutate(tempdiff=omegas_v.durafet-lag(omegas_v.durafet,n=5,default=first(omegas_v.durafet))) %>% # find difference between two temp measurements 5 rows apart to identify where temperature stabilizes
+    mutate(phdiff=omegasph-lag(omegasph,n=5,default=first(omegasph))) # find difference between two pH measurements 5 rows apart to identify where pH stabilizes
+```
+
+## Choose calibration values
+```{r}
+omegas_cleaned <- omegas_calibration %>% # create new data frame after deleting first 150 rows
+  filter(row_number()!=c(1:150)) %>% # remove the first 150 rows (first 30 minutes of data)
+  filter(omegas_calibration,phdiff==min(phdiff)) %>% # select the row that contains the minimum value of change in pH over time and add it alone to a new data frame
+  add_row(filter(omegas_calibration,tempdiff==min(tempdiff))) # select the row that contains the minimum value of change in temperature over time and add it alone to the omegas_cleaned dataframe
+  # what do we do when the row with min tempdiff and the row with min phdiff are different?
 ```
