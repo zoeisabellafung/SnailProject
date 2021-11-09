@@ -84,7 +84,8 @@ tris_ph_template <- data.frame(temp,b,c,d,e,f,g,h,i,j,t,k,m)%>% # create tris pH
 
 ## Create OMEGAS pH sheet
 ```{r}
-omegas_calibration <- data.frame(omegas_v$durafet,omegas_v$v1) %>% # create data frame with durafet therm and voltage 1 values
+omegas_calibration <- data.frame(trisdata$date_time_lubridate,omegas_v$durafet,omegas_v$v1) %>% # create data frame with durafet therm and voltage 1 values
+  rename(date_time=trisdata.date_time_lubridate) %>% # rename date/time column from trisdata data frame
   mutate(trisph=tris_ph_template$trisph) %>% # add tris pH values into calibration dataframe 
   mutate(tk=omegas_v$durafet+273.15) %>% # add TK column to data frame
   mutate(st=(8.31451*tk/96487*log(10))) %>% # add S(T) column to data frame
@@ -101,8 +102,6 @@ omegas_cleaned <- omegas_calibration %>% # work in omegas_calibration dataframe
   filter(row_number()!=c(1:150)) %>% # remove the first 150 rows (first 30 minutes of data)
   slice_min(tempdiff,n=10) %>% # select the rows that contains the 10 minimum values of change in temperature over time 
   slice_min(phdiff,n=1) # select the row that contains the minimum value of change in pH over time in within the 10 lowest temp differences
-  add_row(filter(omegas_calibration,tempdiff==min(tempdiff))) # select the row that contains the minimum value of change in temperature over time and add it alone to the omegas_cleaned dataframe
-  # what do we do when the row with min tempdiff and the row with min phdiff are different?
 ```
 
 ## Adding sensor data into OMEGAS sheet 
