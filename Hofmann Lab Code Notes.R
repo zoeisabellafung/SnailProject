@@ -57,3 +57,11 @@
 # notes for week 7 meeting:
   # what do we do when the rows with min pH/temp differences are not the same?
     # which measurement is the calibration priority?
+
+# calculating durafet therm
+  # Steinhart Constants
+  # SH_A = 0.00106329736674527
+  # SH_B = 0.000251377462346306
+  # SH_C = 2.55455247726963E-08
+  # K = 1 / (SH_A + SH_B * Log(R) + SH_C * (Log(R)) ^ 3)
+  # DurafetTherm = K - 273.15
