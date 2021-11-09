@@ -57,6 +57,7 @@
 # notes for week 7 meeting:
   # what do we do when the rows with min pH/temp differences are not the same?
     # which measurement is the calibration priority?
+  # how do we use the calibration values to calibrate the raw sensor values
 
 # calculating durafet therm
   # Steinhart Constants
@@ -65,3 +66,15 @@
   # SH_C = 2.55455247726963E-08
   # K = 1 / (SH_A + SH_B * Log(R) + SH_C * (Log(R)) ^ 3)
   # DurafetTherm = K - 273.15
+
+# goals for week 7
+  # add Cat_T (column P) in the OMEGAS sheet
+    # note that it doesnt get used but added in anyway
+  # add in column T (column K in Tris template)
+  # filter the 10 most minimum pH difference rows, and then filter the minimum temp difference from that to find the calibration row
+  # make sure phdiff and tempdiff are absolute values
+  # apply calibration values to actual sensor data
+    # create new OMEGAS sheet for the raw data
+    # paste calibration values into top of pH OMEGAS sheet
+      # will change the pH values in OMEGAS pH sheet
+      # then extract temp, pH, and date/time from OMEGAS pH sheet
