@@ -47,7 +47,7 @@ omegas_v <- omegas %>% # create new dataframe using omegas values
          v4=(mv4/1000)) %>% # converting the mV to volts
   mutate(vbattery=((v2/100)*101.57)) %>% # calculate vbattery
   mutate(z=(v4/100)+vbattery*(15000/(1000000+15000))) %>% # calculate column k
-  mutate(y=(z*100000)) %>% # calculate column l
+  mutate(y=(z*1000000)) %>% # calculate column l
   mutate(rthermistor=(y/(vbattery-z))) %>% # calculate Rthermistor
   mutate(sh_a=as.numeric(0.00106329736674527)) %>% # create column with Steinhart constant A
   mutate(sh_b=as.numeric(0.000251377462346306)) %>% # create column with Steinhart constant B
@@ -69,12 +69,14 @@ g <- as.numeric(rep("0.00016329",length(temp))) # create vector for tris pH temp
 h <- as.numeric(rep("64.52243",length(temp))) # create vector for tris pH template column h
 i <- as.numeric(rep("0.084041",length(temp))) # create vector for tris pH template column i
 j <- as.numeric(rep("0.11149858",length(temp))) # create vector for tris pH template column j
-m <- as.numeric(rep("35",length(temp))) # create vector for tris pH template column m
+t <- as.numeric(rep(k+temp),length(temp))
 k <- as.numeric(rep("273.15",length(temp))) # create vector for tris pH template column k
-tris_ph_template <- data.frame(temp,b,c,d,e,f,g,h,i,j,k,m)%>% # create tris pH template as a data frame with all above columns
-  mutate(n=(b-(c*m)-(d*m*m))*1/k) %>% # create column n
+m <- as.numeric(rep("35",length(temp))) # create vector for tris pH template column m
+
+tris_ph_template <- data.frame(temp,b,c,d,e,f,g,h,i,j,t,k,m)%>% # create tris pH template as a data frame with all above columns
+  mutate(n=(b-(c*m)-(d*m*m))*1/t) %>% # create column n
   mutate(o=(-e+(f*m)+(g*m*m))) %>% # create column o
-  mutate(p=(h-(i*m))*log(k)-(j*(k))) %>% # create column p
+  mutate(p=(h-(i*m))*log(t)-(j*(t))) %>% # create column p
   mutate(trisph=(n+o+p)) # calculate tris pH, add as a new column to tris pH template data frame
 ```
 
@@ -89,18 +91,16 @@ omegas_calibration <- data.frame(omegas_v$durafet,omegas_v$v1) %>% # create data
   mutate(eot=(-0.374911706-(0.001*(tk-290.2751473)))) %>% # add Eo(T) column to data frame
   mutate(omegasph=(omegas_v$v1-eot)/st) %>% # add pH column to data frame
   mutate(diff=(trisph-omegasph)) %>% # add difference column (tris pH - omegas pH) to data frame
-  mutate(tempdiff=omegas_v.durafet-lag(omegas_v.durafet,n=5,default=first(omegas_v.durafet))) %>% # find difference between two temp measurements 5 rows apart to identify where temperature stabilizes
-    mutate(phdiff=omegasph-lag(omegasph,n=5,default=first(omegasph))) # find difference between two pH measurements 5 rows apart to identify where pH stabilizes
+  mutate(tempdiff=abs(omegas_v.durafet-lag(omegas_v.durafet,n=5,default=first(omegas_v.durafet)))) %>% # find difference between two temp measurements 5 rows apart to identify where temperature stabilizes
+    mutate(phdiff=abs(omegasph-lag(omegasph,n=5,default=first(omegasph)))) # find difference between two pH measurements 5 rows apart to identify where pH stabilizes
 ```
 
 ## Choose calibration values
 ```{r}
 omegas_cleaned <- omegas_calibration %>% # work in omegas_calibration dataframe
   filter(row_number()!=c(1:150)) %>% # remove the first 150 rows (first 30 minutes of data)
-  subset(omegas_cleaned,phdiff==min(phdiff))
-%>% # select the row that contains the minimum value of change in pH over time and add it alone to a new data frame
-  # THIS WAS WORKING YESTERDAY; WHY NOT TODAY?
-  # ERROR MESSAGE: "omegas_v.durafet must be a logical vector, not a double"
+  slice_min(tempdiff,n=10) %>% # select the rows that contains the 10 minimum values of change in temperature over time 
+  slice_min(phdiff,n=1) # select the row that contains the minimum value of change in pH over time in within the 10 lowest temp differences
   add_row(filter(omegas_calibration,tempdiff==min(tempdiff))) # select the row that contains the minimum value of change in temperature over time and add it alone to the omegas_cleaned dataframe
   # what do we do when the row with min tempdiff and the row with min phdiff are different?
 ```
