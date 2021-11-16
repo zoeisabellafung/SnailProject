@@ -111,6 +111,8 @@ calibration_values <- omegas_calibration %>% # work in omegas_calibration datafr
 rawdata <- read_csv(here("data","7.12.2021-raw.csv")) %>% # read in raw data excel file TIME COLUMN ISNT READING IN RIGHT
   filter(row_number()!=c(1:5)) %>% # remove the first 5 rows
   row_to_names(row_number=1) %>% # make the top row the column headers
+  rename("Date"=1,
+         "Time"=2) %>%
   clean_names() %>% # clean up column header names
   slice(1:(n()-12)) %>% # remove first 2 minutes of data (12 rows)
   mutate(date_lubridate=mdy(date)) %>% # tell R "date" is a DATE
