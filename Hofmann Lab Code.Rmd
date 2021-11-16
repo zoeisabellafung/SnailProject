@@ -173,9 +173,14 @@ omegasph_raw <- data.frame(rawdata$date_time_lubridate,omegas_raw$durafet,omegas
   mutate(trisph=raw_tris_ph$trisph) %>% # add tris pH values into calibration dataframe TRIS PH IS NOT THE SAME LENGTH AS THE RAW DATA
   mutate(tk=omegas_raw$durafet+273.15) %>% # add TK column to data frame
   mutate(st=(8.31451*tk/96487*log(10))) %>% # add S(T) column to data frame
-  mutate(eo=((calibration_values$omegas_v.v1)-(calibration_values$omegasph)*8.31451*(273.15+calibration_values$omegas_v.durafet)*LN(10)/96487)) %>% # calculate eo value using calibration values
+  mutate(eo=((calibration_values$omegas_v.v1)-(calibration_values$omegasph)*8.31451*(273.15+calibration_values$omegas_v.durafet)*log(10)/96487)) %>% # calculate eo value using calibration values
   mutate(eot=(eo-(0.001*(tk-(273.15+calibration_values$omegas_v.durafet))))) %>% # add Eo(T) column to data frame
   mutate(omegasrawph=(omegas_raw$v1-eot)/st) %>% # add pH column to data frame
-  mutate(diff=(trisph-omegasrawph)) %>% # add difference column (tris pH - omegas pH) to data frame
+  mutate(diff=(trisph-omegasrawph)) # add difference column (tris pH - omegas pH) to data frame
 ```
   
+## Creating final table for data analysis
+```{r}
+raw_calibrated <- omegasph_raw %>% # create new dataframe using omegasph_raw data
+  select(date_time,omegas_raw.durafet,omegasrawph) # keep only date/time, temperature, and pH columns
+```
