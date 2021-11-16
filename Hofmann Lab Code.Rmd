@@ -24,7 +24,7 @@ raw <- "7.12.2021-raw.csv" #values collected in field
 
 ### Importing data
 ```{r}
-trisdata <- read_csv(here("data",tris)) %>% # read in tris data excel file
+trisdata <- read_csv(tris) %>% # read in tris data excel file
   filter(row_number()!=c(1:5)) %>% # remove the first 5 rows
   row_to_names(row_number=1) %>% # make the top row the column headers
   clean_names() %>% # clean up column header names
@@ -114,7 +114,7 @@ calibration_values <- omegas_calibration %>% # work in omegas_calibration datafr
 ### Adding sensor data into OMEGAS sheet 
 ## Importing raw data
 ```{r}
-rawdata <- read_csv(here("data",raw)) %>% # read in raw data excel file TIME COLUMN ISNT READING IN RIGHT
+rawdata <- read_csv(raw) %>% # read in raw data excel file
   filter(row_number()!=c(1:5)) %>% # remove the first 5 rows
   row_to_names(row_number=1) %>% # make the top row the column headers
   rename("Date"=1,
@@ -122,7 +122,7 @@ rawdata <- read_csv(here("data",raw)) %>% # read in raw data excel file TIME COL
   clean_names() %>% # clean up column header names
   slice(1:(n()-12)) %>% # remove first 2 minutes of data (12 rows)
   mutate(date_lubridate=mdy(date)) %>% # tell R "date" is a DATE
-  mutate(time_lubridate=hms(time)) %>% # tell R "time" is a TIME HAD TO EDIT THIS BC COLUMN NOT TITLED RIGHT
+  mutate(time_lubridate=hms(time)) %>% # tell R "time" is a TIME
   unite(date_time, c(date,time), sep = " ", remove = TRUE) %>% # combine the date and time columns
   mutate(date_time_lubridate=mdy_hms(date_time)) # tell R "date_time" is a DATE and a TIME
 ```
@@ -195,5 +195,5 @@ raw_calibrated <- omegasph_raw %>% # create new dataframe using omegasph_raw dat
          "Temperature"=2,
          "pH"=3)
 
-write.csv(raw_calibrated, here("data", "processed_data.csv"), row.names = FALSE)
+write.csv(raw_calibrated, "processed_data.csv", row.names = FALSE)
 ```
