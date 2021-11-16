@@ -182,5 +182,10 @@ omegasph_raw <- data.frame(rawdata$date_time_lubridate,omegas_raw$durafet,omegas
 ## Creating final table for data analysis
 ```{r}
 raw_calibrated <- omegasph_raw %>% # create new dataframe using omegasph_raw data
-  select(date_time,omegas_raw.durafet,omegasrawph) # keep only date/time, temperature, and pH columns
+  select(date_time,omegas_raw.durafet,omegasrawph) %>% # keep only date/time, temperature, and pH columns
+  rename("Date, Time"=1,
+         "Temperature"=2,
+         "pH"=3)
+
+write.csv(raw_calibrated, here("data", "processed_data.csv"), row.names = FALSE)
 ```
