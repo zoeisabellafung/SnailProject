@@ -70,8 +70,8 @@ g <- as.numeric(rep("0.00016329",length(temp))) # create vector for tris pH temp
 h <- as.numeric(rep("64.52243",length(temp))) # create vector for tris pH template column h
 i <- as.numeric(rep("0.084041",length(temp))) # create vector for tris pH template column i
 j <- as.numeric(rep("0.11149858",length(temp))) # create vector for tris pH template column j
-t <- as.numeric(rep(k+temp),length(temp)) # create vector for tris pH template column t
 k <- as.numeric(rep("273.15",length(temp))) # create vector for tris pH template column k
+t <- as.numeric(rep(k+temp),length(temp)) # create vector for tris pH template column t
 m <- as.numeric(rep("35",length(temp))) # create vector for tris pH template column m
 
 tris_ph_template <- data.frame(temp,b,c,d,e,f,g,h,i,j,t,k,m)%>% # create tris pH template as a data frame with all above columns
@@ -155,8 +155,8 @@ g <- as.numeric(rep("0.00016329",length(temp))) # create vector for tris pH temp
 h <- as.numeric(rep("64.52243",length(temp))) # create vector for tris pH template column h
 i <- as.numeric(rep("0.084041",length(temp))) # create vector for tris pH template column i
 j <- as.numeric(rep("0.11149858",length(temp))) # create vector for tris pH template column j
-t <- as.numeric(rep(k+temp),length(temp)) # create vector for tris pH template column t
 k <- as.numeric(rep("273.15",length(temp))) # create vector for tris pH template column k
+t <- as.numeric(rep(k+temp),length(temp)) # create vector for tris pH template column t
 m <- as.numeric(rep("35",length(temp))) # create vector for tris pH template column m
 
 raw_tris_ph <- data.frame(temp,b,c,d,e,f,g,h,i,j,t,k,m)%>% # create tris pH template as a data frame with all above columns
