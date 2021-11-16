@@ -67,14 +67,17 @@
   # K = 1 / (SH_A + SH_B * Log(R) + SH_C * (Log(R)) ^ 3)
   # DurafetTherm = K - 273.15
 
-# goals for week 7
-  # add Cat_T (column P) in the OMEGAS sheet
+# goals for week 8
+  # add Cal_T (column P) in the OMEGAS sheet (DONE)
     # note that it doesnt get used but added in anyway
-  # add in column T (column K in Tris template)
-  # filter the 10 most minimum pH difference rows, and then filter the minimum temp difference from that to find the calibration row
-  # make sure phdiff and tempdiff are absolute values
+  # add in column T (column K in Tris template) (DONE)
+  # filter the 10 most minimum pH difference rows, and then filter the minimum temp difference from that to find the calibration row (DONE)
+  # make sure phdiff and tempdiff are absolute values (DONE)
   # apply calibration values to actual sensor data
-    # create new OMEGAS sheet for the raw data
+    # create new OMEGAS sheet for the raw data (DONE)
     # paste calibration values into top of pH OMEGAS sheet
       # will change the pH values in OMEGAS pH sheet
       # then extract temp, pH, and date/time from OMEGAS pH sheet
+
+# eot=((calibration_values$omegas_v.v1)-(calibration_values$omegasph)*8.31451*(273.15+calibration_values$omegas_v.durafet)*LN(10)/96487)
+
