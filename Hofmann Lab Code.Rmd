@@ -16,9 +16,15 @@ library(here)
 library(lubridate)
 ```
 
+#Name your data files
+```{r}
+tris <-"7.12.2021-tris.csv" #values collected during calibration
+raw <- "7.12.2021-raw.csv" #values collected in field
+```
+
 ### Importing data
 ```{r}
-trisdata <- read_csv(here("data","7.12.2021-tris.csv")) %>% # read in tris data excel file
+trisdata <- read_csv(here("data",tris)) %>% # read in tris data excel file
   filter(row_number()!=c(1:5)) %>% # remove the first 5 rows
   row_to_names(row_number=1) %>% # make the top row the column headers
   clean_names() %>% # clean up column header names
@@ -108,16 +114,16 @@ calibration_values <- omegas_calibration %>% # work in omegas_calibration datafr
 ### Adding sensor data into OMEGAS sheet 
 ## Importing raw data
 ```{r}
-rawdata <- read_csv(here("data","7.12.2021-raw.csv")) %>% # read in raw data excel file TIME COLUMN ISNT READING IN RIGHT
+rawdata <- read_csv(here("data",raw)) %>% # read in raw data excel file TIME COLUMN ISNT READING IN RIGHT
   filter(row_number()!=c(1:5)) %>% # remove the first 5 rows
   row_to_names(row_number=1) %>% # make the top row the column headers
   rename("Date"=1,
          "Time"=2) %>%
   clean_names() %>% # clean up column header names
   slice(1:(n()-12)) %>% # remove first 2 minutes of data (12 rows)
-  mutate(date_lubridate=mdy(Date)) %>% # tell R "date" is a DATE
-  mutate(time_lubridate=hms(Time)) %>% # tell R "time" is a TIME HAD TO EDIT THIS BC COLUMN NOT TITLED RIGHT
-  unite(date_time, c(Date,Time), sep = " ", remove = TRUE) %>% # combine the date and time columns
+  mutate(date_lubridate=mdy(date)) %>% # tell R "date" is a DATE
+  mutate(time_lubridate=hms(time)) %>% # tell R "time" is a TIME HAD TO EDIT THIS BC COLUMN NOT TITLED RIGHT
+  unite(date_time, c(date,time), sep = " ", remove = TRUE) %>% # combine the date and time columns
   mutate(date_time_lubridate=mdy_hms(date_time)) # tell R "date_time" is a DATE and a TIME
 ```
 
