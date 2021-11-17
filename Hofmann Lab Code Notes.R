@@ -81,3 +81,15 @@
 
 # eot=((calibration_values$omegas_v.v1)-(calibration_values$omegasph)*8.31451*(273.15+calibration_values$omegas_v.durafet)*LN(10)/96487)
 
+  # goals for week 9
+    # rename data frames to be less confusing (use Tris and Raw)
+    # rename columns of final data frame 
+      # rename("Date, Time"=1,"Temperature"=2,"pH"=3)
+    # export final data frame to a csv file
+      # write.csv(raw_calibrated,here="data","processed_data.csv",rownames=FALSE)
+    # rename date and time columns in the raw data
+      # fix the code in this chunk
+    # restructure hashtags (2 hashtags > 3)
+    # run different months data through the code and compare to hand-calculated values
+      # especially for 9/16
+

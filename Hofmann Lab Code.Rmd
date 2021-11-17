@@ -16,17 +16,21 @@ library(here)
 library(lubridate)
 ```
 
-#Name your data files
+# Name your data files
 ```{r}
-tris <-"7.12.2021-tris.csv" #values collected during calibration
-raw <- "7.12.2021-raw.csv" #values collected in field
+tris <-"7.12.2021-tris.csv" # values collected during calibration
+raw <- "7.12.2021-raw.csv" # values collected in field
+filename <- "7.12.2021" # add file name for final data frame
 ```
 
-### Importing data
+# Calibration with tris
+## Importing data
 ```{r}
 trisdata <- read_csv(tris) %>% # read in tris data excel file
   filter(row_number()!=c(1:5)) %>% # remove the first 5 rows
   row_to_names(row_number=1) %>% # make the top row the column headers
+  rename("Date"=1,
+         "Time"=2) %>% # rename date and time columns
   clean_names() %>% # clean up column header names
   slice(1:(n()-12)) %>% # remove first 2 minutes of data (12 rows)
   mutate(date_lubridate=mdy(date)) %>% # tell R "date" is a DATE
@@ -35,9 +39,9 @@ trisdata <- read_csv(tris) %>% # read in tris data excel file
   mutate(date_time_lubridate=mdy_hms(date_time)) # tell R "date_time" is a DATE and a TIME
 ```
 
-### Creating the OMEGAS temperature table
+## Creating the OMEGAS temperature table
 ```{r}
-omegas <- data.frame(trisdata$voltage_1_m_v,trisdata$voltage_2_m_v,trisdata$voltage_3_m_v,trisdata$voltage_4_m_v) %>% # create OMEGAS data frame with the tris voltages
+tris_voltages <- data.frame(trisdata$voltage_1_m_v,trisdata$voltage_2_m_v,trisdata$voltage_3_m_v,trisdata$voltage_4_m_v) %>% # create OMEGAS data frame with the tris voltages
   mutate(mv1=as.numeric(trisdata.voltage_1_m_v),
          mv2=as.numeric(trisdata.voltage_2_m_v),
          mv3=as.numeric(trisdata.voltage_3_m_v),
@@ -47,7 +51,7 @@ omegas <- data.frame(trisdata$voltage_1_m_v,trisdata$voltage_2_m_v,trisdata$volt
 
 ### Calculating Rthermistor
 ```{r}
-omegas_v <- omegas %>% # create new dataframe using omegas values
+omegas_temp_tris <- tris_voltages %>% # create new data frame using omegas values
   mutate(v1=(mv1/1000),
          v2=(mv2/1000),
          v3=(mv3/1000),
@@ -66,7 +70,7 @@ omegas_v <- omegas %>% # create new dataframe using omegas values
 
 ### Calculating Tris pH
 ```{r}
-temp <- c(omegas_v$durafet) # copy durafet therm into tris pH template
+temp <- c(omegas_temp_tris$durafet) # copy durafet therm into tris pH template
 b <- as.numeric(rep("11911.08",length(temp))) # create vector for tris pH template column b
 c <- as.numeric(rep("18.2499",length(temp))) # create vector for tris pH template column c
 d <- as.numeric(rep("0.039336",length(temp))) # create vector for tris pH template column d
@@ -87,32 +91,32 @@ tris_ph_template <- data.frame(temp,b,c,d,e,f,g,h,i,j,t,k,m)%>% # create tris pH
   mutate(trisph=(n+o+p)) # calculate tris pH, add as a new column to tris pH template data frame
 ```
 
-### Calculating calibration values
-
-## Create OMEGAS pH sheet
+## Calculating calibration values
+### Create OMEGAS pH sheet
 ```{r}
-omegas_calibration <- data.frame(trisdata$date_time_lubridate,omegas_v$durafet,omegas_v$v1) %>% # create data frame with durafet therm and voltage 1 values
+omegas_ph_tris <- data.frame(trisdata$date_time_lubridate,omegas_temp_tris$durafet,omegas_temp_tris$v1) %>% # create data frame with durafet therm and voltage 1 values
   rename(date_time=trisdata.date_time_lubridate) %>% # rename date/time column from trisdata data frame
   mutate(trisph=tris_ph_template$trisph) %>% # add tris pH values into calibration dataframe 
-  mutate(tk=omegas_v$durafet+273.15) %>% # add TK column to data frame
+  mutate(tk=omegas_temp_tris$durafet+273.15) %>% # add TK column to data frame
   mutate(st=(8.31451*tk/96487*log(10))) %>% # add S(T) column to data frame
   mutate(eot=(-0.374911706-(0.001*(tk-290.2751473)))) %>% # add Eo(T) column to data frame
-  mutate(omegasph=(omegas_v$v1-eot)/st) %>% # add pH column to data frame
+  mutate(omegasph=(omegas_temp_tris$v1-eot)/st) %>% # add pH column to data frame
   mutate(diff=(trisph-omegasph)) %>% # add difference column (tris pH - omegas pH) to data frame
-  mutate(tempdiff=abs(omegas_v.durafet-lag(omegas_v.durafet,n=5,default=first(omegas_v.durafet)))) %>% # find difference between two temp measurements 5 rows apart to identify where temperature stabilizes
+  mutate(tempdiff=abs(omegas_temp_tris.durafet-lag(omegas_temp_tris.durafet,n=5,default=first(omegas_temp_tris.durafet)))) %>% # find difference between two temp measurements 5 rows apart to identify where temperature stabilizes
     mutate(phdiff=abs(omegasph-lag(omegasph,n=5,default=first(omegasph)))) # find difference between two pH measurements 5 rows apart to identify where pH stabilizes
 ```
 
-## Choose calibration values
+### Choose calibration values
 ```{r}
-calibration_values <- omegas_calibration %>% # work in omegas_calibration dataframe
+calibration_values <- omegas_ph_tris %>% # work in omegas_calibration dataframe
   filter(row_number()!=c(1:150)) %>% # remove the first 150 rows (first 30 minutes of data)
   slice_min(phdiff,n=10) %>% # select the rows that contains the 10 minimum values of change in pH over time 
   slice_min(tempdiff,n=1) # select the row that contains the minimum value of change in temperature over time in within the 10 lowest temp differences
 ```
 
-### Adding sensor data into OMEGAS sheet 
-## Importing raw data
+# Calibration of raw data
+## Adding sensor data into OMEGAS sheet 
+### Importing raw data
 ```{r}
 rawdata <- read_csv(raw) %>% # read in raw data excel file
   filter(row_number()!=c(1:5)) %>% # remove the first 5 rows
@@ -127,9 +131,9 @@ rawdata <- read_csv(raw) %>% # read in raw data excel file
   mutate(date_time_lubridate=mdy_hms(date_time)) # tell R "date_time" is a DATE and a TIME
 ```
 
-## Creating OMEGAS temperature table for raw data
+### Creating OMEGAS temperature table for raw data
 ```{r}
-omegas_raw <- data.frame(rawdata$voltage_1_m_v,rawdata$voltage_2_m_v,rawdata$voltage_3_m_v,rawdata$voltage_4_m_v) %>% # create OMEGAS data frame with the raw voltages
+omegas_temp_raw <- data.frame(rawdata$voltage_1_m_v,rawdata$voltage_2_m_v,rawdata$voltage_3_m_v,rawdata$voltage_4_m_v) %>% # create OMEGAS data frame with the raw voltages
   mutate(mv1=as.numeric(rawdata.voltage_1_m_v),
          mv2=as.numeric(rawdata.voltage_2_m_v),
          mv3=as.numeric(rawdata.voltage_3_m_v),
@@ -151,9 +155,9 @@ omegas_raw <- data.frame(rawdata$voltage_1_m_v,rawdata$voltage_2_m_v,rawdata$vol
   mutate(calt=as.numeric(1.0086*durafet+0.3157)) # create Cal_T column (does not get used for further calibration)
 ```
 
-## Calculating Tris pH to match length of raw data 
+### Calculating Tris pH to match length of raw data 
 ```{r}
-temp <- c(omegas_raw$durafet) # copy durafet therm into tris pH template
+temp <- c(omegas_temp_raw$durafet) # copy durafet therm into tris pH template
 b <- as.numeric(rep("11911.08",length(temp))) # create vector for tris pH template column b
 c <- as.numeric(rep("18.2499",length(temp))) # create vector for tris pH template column c
 d <- as.numeric(rep("0.039336",length(temp))) # create vector for tris pH template column d
@@ -167,33 +171,33 @@ k <- as.numeric(rep("273.15",length(temp))) # create vector for tris pH template
 t <- as.numeric(rep(k+temp),length(temp)) # create vector for tris pH template column t
 m <- as.numeric(rep("35",length(temp))) # create vector for tris pH template column m
 
-raw_tris_ph <- data.frame(temp,b,c,d,e,f,g,h,i,j,t,k,m)%>% # create tris pH template as a data frame with all above columns
+raw_tris_ph <- data.frame(temp,b,c,d,e,f,g,h,i,j,t,k,m) %>% # create tris pH template as a data frame with all above columns
   mutate(n=(b-(c*m)-(d*m*m))*1/t) %>% # create column n
   mutate(o=(-e+(f*m)+(g*m*m))) %>% # create column o
   mutate(p=(h-(i*m))*log(t)-(j*(t))) %>% # create column p
   mutate(trisph=(n+o+p)) # calculate tris pH, add as a new column to tris pH template data frame
 ```
 
-## Adding calibration values to OMEGAS pH table for raw data
+### Adding calibration values to OMEGAS pH table for raw data
 ```{r}
-omegasph_raw <- data.frame(rawdata$date_time_lubridate,omegas_raw$durafet,omegas_raw$v1) %>% # create data frame with durafet therm and voltage 1 values
+omegas_ph_raw <- data.frame(rawdata$date_time_lubridate,omegas_temp_raw$durafet,omegas_temp_raw$v1) %>% # create data frame with durafet therm and voltage 1 values
   rename(date_time=rawdata.date_time_lubridate) %>% # rename date/time column from trisdata data frame
   mutate(trisph=raw_tris_ph$trisph) %>% # add tris pH values into calibration dataframe TRIS PH IS NOT THE SAME LENGTH AS THE RAW DATA
-  mutate(tk=omegas_raw$durafet+273.15) %>% # add TK column to data frame
+  mutate(tk=omegas_temp_raw$durafet+273.15) %>% # add TK column to data frame
   mutate(st=(8.31451*tk/96487*log(10))) %>% # add S(T) column to data frame
-  mutate(eo=((calibration_values$omegas_v.v1)-(calibration_values$omegasph)*8.31451*(273.15+calibration_values$omegas_v.durafet)*log(10)/96487)) %>% # calculate eo value using calibration values
-  mutate(eot=(eo-(0.001*(tk-(273.15+calibration_values$omegas_v.durafet))))) %>% # add Eo(T) column to data frame
-  mutate(omegasrawph=(omegas_raw$v1-eot)/st) %>% # add pH column to data frame
+  mutate(eo=((calibration_values$omegas_temp_tris.v1)-(calibration_values$omegasph)*8.31451*(273.15+calibration_values$omegas_temp_tris.durafet)*log(10)/96487)) %>% # calculate eo value using calibration values
+  mutate(eot=(eo-(0.001*(tk-(273.15+calibration_values$omegas_temp_tris.durafet))))) %>% # add Eo(T) column to data frame
+  mutate(omegasrawph=(omegas_temp_raw$v1-eot)/st) %>% # add pH column to data frame
   mutate(diff=(trisph-omegasrawph)) # add difference column (tris pH - omegas pH) to data frame
 ```
   
 ## Creating final table for data analysis
 ```{r}
-raw_calibrated <- omegasph_raw %>% # create new dataframe using omegasph_raw data
-  select(date_time,omegas_raw.durafet,omegasrawph) %>% # keep only date/time, temperature, and pH columns
+raw_calibrated <- omegas_ph_raw %>% # create new dataframe using omegasph_raw data
+  select(date_time,omegas_temp_raw.durafet,omegasrawph) %>% # keep only date/time, temperature, and pH columns
   rename("Date, Time"=1,
          "Temperature"=2,
          "pH"=3)
 
-write.csv(raw_calibrated, "processed_data.csv", row.names = FALSE)
+write.csv(raw_calibrated, paste(filename,".csv", sep=""), row.names = FALSE) # create csv with final processed data
 ```
