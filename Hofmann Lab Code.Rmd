@@ -18,9 +18,9 @@ library(lubridate)
 
 # Name your data files
 ```{r}
-tris <-"7.12.2021-tris.csv" # values collected during calibration
-raw <- "7.12.2021-raw.csv" # values collected in field
-filename <- "7.12.2021" # add file name for final data frame
+tris <-"9.16.2021-1_tris.csv" # values collected during calibration
+raw <- "9.16.2021-1_lol.csv" # values collected in field
+filename <- "9.16.2021" # add file name for final data frame
 ```
 
 # Calibration with tris
