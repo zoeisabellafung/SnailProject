@@ -93,3 +93,10 @@
     # run different months data through the code and compare to hand-calculated values
       # especially for 9/16
 
+  # goals for week 10
+    # fix what is wrong with eo
+      # run all data frames through and check with the omegas files 
+    # watch shiny workshop: https://vimeo.com/356696243
+      # create own shiny app
+      # code i need will be in github
+
