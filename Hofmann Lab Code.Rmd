@@ -18,9 +18,9 @@ library(lubridate)
 
 # Name your data files
 ```{r}
-tris <-"9.16.2021-1_tris.csv" # values collected during calibration
-raw <- "9.16.2021-1_lol.csv" # values collected in field
-filename <- "9.16.2021" # add file name for final data frame
+tris <-"8.19.2021-1_lol-tris.csv" # values collected during calibration
+raw <- "8.19.2021-1_lol.csv" # values collected in field
+filename <- "8.19.2021" # add file name for final data frame
 ```
 
 # Calibration with tris
@@ -93,7 +93,7 @@ tris_ph_template <- data.frame(temp,b,c,d,e,f,g,h,i,j,t,k,m)%>% # create tris pH
 
 ## Calculating calibration values
 ### Create OMEGAS pH sheet
-```{r}
+```{r}  
 omegas_ph_tris <- data.frame(trisdata$date_time_lubridate,omegas_temp_tris$durafet,omegas_temp_tris$v1) %>% # create data frame with durafet therm and voltage 1 values
   rename(date_time=trisdata.date_time_lubridate) %>% # rename date/time column from trisdata data frame
   mutate(trisph=tris_ph_template$trisph) %>% # add tris pH values into calibration dataframe 
@@ -102,14 +102,14 @@ omegas_ph_tris <- data.frame(trisdata$date_time_lubridate,omegas_temp_tris$duraf
   mutate(eot=(-0.374911706-(0.001*(tk-290.2751473)))) %>% # add Eo(T) column to data frame
   mutate(omegasph=(omegas_temp_tris$v1-eot)/st) %>% # add pH column to data frame
   mutate(diff=(trisph-omegasph)) %>% # add difference column (tris pH - omegas pH) to data frame
-  mutate(tempdiff=abs(omegas_temp_tris.durafet-lag(omegas_temp_tris.durafet,n=5,default=first(omegas_temp_tris.durafet)))) %>% # find difference between two temp measurements 5 rows apart to identify where temperature stabilizes
-    mutate(phdiff=abs(omegasph-lag(omegasph,n=5,default=first(omegasph)))) # find difference between two pH measurements 5 rows apart to identify where pH stabilizes
+  mutate(tempdiff=abs(omegas_temp_tris.durafet-lag(omegas_temp_tris.durafet,n=1,default=first(omegas_temp_tris.durafet)))) %>% # find difference between two temp measurements 5 rows apart to identify where temperature stabilizes
+    mutate(phdiff=abs(trisph-lag(trisph,n=1,default=first(trisph)))) # find difference between two pH measurements 3 rows apart to identify where pH stabilizes
 ```
 
 ### Choose calibration values
 ```{r}
 calibration_values <- omegas_ph_tris %>% # work in omegas_calibration dataframe
-  filter(row_number()!=c(1:100)) %>% # remove the first 100 rows (first 20 minutes of data)
+  filter(row_number()!=c(1:50)) %>% # remove the first 100 rows (first 10 minutes of data)
   slice_min(tempdiff,n=10) %>% # select the rows that contains the 10 minimum values of change in temperature over time 
   slice_min(phdiff,n=1) # select the row that contains the minimum value of change in pH over time in within the 10 lowest temp differences
 ```
