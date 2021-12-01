@@ -100,3 +100,14 @@
       # create own shiny app
       # code i need will be in github
 
+  # notes for week 10
+    # what was wrong: was using omegas ph instead of tris ph in the calculation of eo
+
+  # goals for winter break
+https://github.com/dorisliu1104/Outreach-Fall-ShinyApp
+    # go thru doris code and make edits
+    # familiarize self with shiny
+https://github.com/ameliaritger/lionfish-diet-choice
+    # use readme template to make readme for this code
+
+

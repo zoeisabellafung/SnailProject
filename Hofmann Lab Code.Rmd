@@ -18,9 +18,9 @@ library(lubridate)
 
 # Name your data files
 ```{r}
-tris <-"8.19.2021-1_lol-tris.csv" # values collected during calibration
-raw <- "8.19.2021-1_lol.csv" # values collected in field
-filename <- "8.19.2021" # add file name for final data frame
+tris <-"9.16.2021-1_tris.csv" # values collected during calibration
+raw <- "9.16.2021-1_lol.csv" # values collected in field
+filename <- "9.16.2021" # add file name for final data frame
 ```
 
 # Calibration with tris
@@ -102,8 +102,8 @@ omegas_ph_tris <- data.frame(trisdata$date_time_lubridate,omegas_temp_tris$duraf
   mutate(eot=(-0.374911706-(0.001*(tk-290.2751473)))) %>% # add Eo(T) column to data frame
   mutate(omegasph=(omegas_temp_tris$v1-eot)/st) %>% # add pH column to data frame
   mutate(diff=(trisph-omegasph)) %>% # add difference column (tris pH - omegas pH) to data frame
-  mutate(tempdiff=abs(omegas_temp_tris.durafet-lag(omegas_temp_tris.durafet,n=1,default=first(omegas_temp_tris.durafet)))) %>% # find difference between two temp measurements 5 rows apart to identify where temperature stabilizes
-    mutate(phdiff=abs(trisph-lag(trisph,n=1,default=first(trisph)))) # find difference between two pH measurements 3 rows apart to identify where pH stabilizes
+  mutate(tempdiff=abs(omegas_temp_tris.durafet-lag(omegas_temp_tris.durafet,n=4,default=first(omegas_temp_tris.durafet)))) %>% # find difference between two temp measurements 5 rows apart to identify where temperature stabilizes
+    mutate(phdiff=abs(trisph-lag(trisph,n=4,default=first(trisph)))) # find difference between two pH measurements 4 rows apart to identify where pH stabilizes
 ```
 
 ### Choose calibration values
@@ -200,4 +200,5 @@ raw_calibrated <- omegas_ph_raw %>% # create new dataframe using omegasph_raw da
          "pH"=3)
 
 write.csv(raw_calibrated, paste(filename,".csv", sep=""), row.names = FALSE) # create csv with final processed data
+write.csv(calibration_values,paste(filename,"_calibration.csv",sep=""),row.names=FALSE) # create csv with calibration values
 ```
