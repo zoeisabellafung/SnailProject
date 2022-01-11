@@ -1,11 +1,11 @@
 # Hofmann Lab Snail Project Calibration Code
 Here you will find the repository for code that can be used to calibrate pH and temperature data collected along the California coast. The repository is maintained by Zoë Fung (GitHub: [@zoeisabellafung](https://github.com/zoeisabellafung)) at the University of California, Santa Barbara.
 
-![*Tegula funebralis*, Black turban snail](/media/teggy.JPG?raw=true)
-###### photo by Amelia Ritger
+![Alt text](/media/teggy.JPG?raw=true)
+###### photo by Amelia Ritger; *Tegula funebralis*, Black turban snail
 
-![Sensor collecting pH and temperature data in Bodega Bay, CA](/media/bodega-sun.JPG?raw=true)
-###### photo by Amelia Ritger
+![Alt text](/media/bodega-sun.JPG?raw=true)
+###### photo by Amelia Ritger; Sensor collecting pH and temperature data in Bodega Bay, CA
 
 ## Abstract
 This code was written under the guidance of Amelia Ritger (GitHub: [@ameliaritger](https://github.com/ameliaritger)), in the scope of her research regarding large-scale patterns of intraspecific variation in the black turban snail (*Tegula funebralis*). Ritger's research uses temperature and pH data collected from various sensors within the California Current Large Marine Ecosystem to analyze the resiliency of the turban snail to environmental change. To use this script, upload a dataframe containing the values collected during calibration and a dataframe containing the values collected in the field. The script will generate a .csv file with the calibrated temperature and pH values as well as the date/time associated with each measurement.
