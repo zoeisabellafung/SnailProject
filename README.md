@@ -1,10 +1,10 @@
 # Hofmann Lab Snail Project Calibration Code
 Here you will find the repository for code that can be used to calibrate pH and temperature data collected along the California coast. The repository is maintained by Zoë Fung (GitHub: [@zoeisabellafung](https://github.com/zoeisabellafung)) at the University of California, Santa Barbara.
 
-![*Tegula funebralis*, Black turban snail](/teggy.JPG?raw=true)
+![*Tegula funebralis*, Black turban snail](/media/teggy.JPG?raw=true)
 ###### photo by Amelia Ritger
 
-![Sensor collecting pH and temperature data in Bodega Bay, CA](/bodega-sun.JPG?raw=true)
+![Sensor collecting pH and temperature data in Bodega Bay, CA](/media/bodega-sun.JPG?raw=true)
 ###### photo by Amelia Ritger
 
 ## Abstract
