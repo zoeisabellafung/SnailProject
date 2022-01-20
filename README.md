@@ -1,10 +1,10 @@
 # Hofmann Lab Snail Project Calibration Code
 Here you will find the repository for code that can be used to calibrate pH and temperature data collected along the California coast. The repository is maintained by Zoë Fung (GitHub: [@zoeisabellafung](https://github.com/zoeisabellafung)) at the University of California, Santa Barbara.
 
-![Alt text](/SnailProject/teggy.JPG?raw=true)
+![Alt text](/media/teggy.JPG?raw=true)
 ###### photo by Amelia Ritger; *Tegula funebralis*, Black turban snail
 
-![Alt text](/SnailProject/bodega-sun.JPG?raw=true)
+![Alt text](/media/bodega-sun.JPG?raw=true)
 ###### photo by Amelia Ritger; Sensor collecting pH and temperature data in Bodega Bay, CA
 
 ## Abstract
@@ -20,8 +20,9 @@ Hofmann Lab Code.Rmd | customizable R script that converts raw temperature and p
 1. Download the required packages, located at the top of the script (install.packages(" "))
 2. Enter the file name of your .csv sheet with values collected during calibration under "tris" (tris <- "your_file_name.csv")
 3. Enter the file name of your .csv sheet with values collected in the field under "raw" (raw <- "your_file_name_.csv")
-4. Name the file that the script will automatically add to your working directory after calibrating the values you collected in the field under "filename" (filename <- "your_file_name").
-*Note: do not add ".csv" to the entry under "filename"; it will be automatically added by the script.*
+4. Name the file that the script will automatically add to your working directory after calibrating the values you collected in the field under "filename" (filename <- "your_file_name")
+
+*Note: do not add ".csv" to the entry under "filename"; it will be automatically added by the script*
 5. Run the script! The generated file will contain calibrated pH values and temperature values, and the corresponding date/time for each measurement
 
 ## Metadata 
