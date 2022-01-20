@@ -22,7 +22,7 @@ Hofmann Lab Code.Rmd | customizable R script that converts raw temperature and p
 3. Enter the file name of your .csv sheet with values collected in the field under "raw" (raw <- "your_file_name_.csv")
 4. Name the file that the script will automatically add to your working directory after calibrating the values you collected in the field under "filename" (filename <- "your_file_name")
 
-#####Note: do not add ".csv" to the entry under "filename"; it will be automatically added by the script
+##### Note: do not add ".csv" to the entry under "filename"; it will be automatically added by the script
 5. Run the script! The generated file will contain calibrated pH values and temperature values, and the corresponding date/time for each measurement
 
 ## Metadata 
